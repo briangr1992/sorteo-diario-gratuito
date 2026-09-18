@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Zona de Juegos</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #000;
+    color: #d4af37;
+    font-family: "Courier New", monospace;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.app {
+    width: 100%;
+    max-width: 1050px;
+    min-height: 100vh;
+    background: #050505;
+    padding: 35px 20px 60px;
+    text-align: center;
+}
+
+
+/* =========================
+   TITULO
+========================= */
+
+.title {
+
+    font-size: clamp(28px, 5vw, 46px);
+
+    letter-spacing: 4px;
+
+    margin-bottom: 15px;
+
+    color: #d4af37;
+
+    text-shadow:
+        0 0 5px rgba(212,175,55,0.5),
+        0 0 15px rgba(212,175,55,0.3);
+}
+
+
+.subtitle {
+
+    font-size: clamp(18px, 3vw, 26px);
+
+    margin-bottom: 55px;
+
+}
+
+
+/* =========================
+   PUNTOS
+========================= */
+
+.balance {
+
+    font-size: clamp(20px, 3vw, 28px);
+
+    margin-bottom: 50px;
+
+    border-bottom: 1px solid #d4af37;
+
+    padding-bottom: 20px;
+}
+
+#points {
+
+    color: #ffd700;
+
+}
+
+
+/* =========================
+   JUEGOS
+========================= */
+
+.games {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 25px;
+
+    max-width: 900px;
+
+    margin: 0 auto;
+}
+
+
+.game {
+
+    display: block;
+
+    border: 2px solid #d4af37;
+
+    padding: 45px 20px;
+
+    color: #d4af37;
+
+    text-decoration: none;
+
+    transition: 0.25s;
+
+    box-shadow:
+        0 0 10px
+        rgba(212,175,55,0.15);
+}
+
+
+.game:hover {
+
+    background: #d4af37;
+
+    color: #000;
+
+    transform: translateY(-6px);
+
+    box-shadow:
+        0 0 30px
+        rgba(212,175,55,0.5);
+}
+
+
+.game-icon {
+
+    font-size: 60px;
+
+    margin-bottom: 25px;
+}
+
+
+.game-name {
+
+    font-size: clamp(22px, 3vw, 30px);
+
+    margin-bottom: 12px;
+}
+
+
+.game-description {
+
+    font-size: 16px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================
+   VOLVER
+========================= */
+
+.back {
+
+    display: inline-block;
+
+    margin-top: 70px;
+
+    padding: 15px 30px;
+
+    border: 1px solid #d4af37;
+
+    color: #d4af37;
+
+    text-decoration: none;
+
+    font-size: 20px;
+
+    transition: 0.2s;
+}
+
+
+.back:hover {
+
+    background: #d4af37;
+
+    color: #000;
+}
+
+
+/* =========================
+   MOVIL
+========================= */
+
+@media(max-width:700px) {
+
+    .app {
+
+        padding:
+            25px 15px 50px;
+
+    }
+
+    .games {
+
+        grid-template-columns: 1fr;
+
+        max-width: 500px;
+
+    }
+
+    .game {
+
+        padding: 35px 20px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+```
+<!-- TITULO -->
+
+<div class="title">
+
+    🎰 ZONA DE JUEGOS
+
+</div>
+
+
+<div class="subtitle">
+
+    ¡Elige tu juego y empieza a jugar!
+
+</div>
+
+
+<!-- PUNTOS -->
+
+<div class="balance">
+
+    Tus puntos:
+
+    <span id="points">
+        0
+    </span>
+
+</div>
+
+
+<!-- JUEGOS -->
+
+<div class="games">
+
+
+    <!-- BLACKJACK -->
+
+    <a href="blackjack.html" class="game">
+
+        <div class="game-icon">
+            🃏
+        </div>
+
+        <div class="game-name">
+            BLACKJACK
+        </div>
+
+        <div class="game-description">
+            Juega contra el crupier
+        </div>
+
+    </a>
+
+
+    <!-- POKER -->
+
+    <a href="poker.html" class="game">
+
+        <div class="game-icon">
+            ♠️
+        </div>
+
+        <div class="game-name">
+            PÓKER
+        </div>
+
+        <div class="game-description">
+            Pon a prueba tu estrategia
+        </div>
+
+    </a>
+
+
+    <!-- RULETA -->
+
+    <a href="roulette.html" class="game">
+
+        <div class="game-icon">
+            🎡
+        </div>
+
+        <div class="game-name">
+            RULETA
+        </div>
+
+        <div class="game-description">
+            Apuesta tus puntos
+        </div>
+
+    </a>
+
+
+</div>
+
+
+<!-- VOLVER -->
+
+<a href="index.html" class="back">
+
+    ← VOLVER AL SORTEO
+
+</a>
+```
+
+</div>
+
+<script>
+
+/* =========================
+   MOSTRAR PUNTOS
+========================= */
+
+let points =
+    localStorage.getItem("lotteryPoints");
+
+
+if (points === null) {
+
+    points = 127;
+
+    localStorage.setItem(
+        "lotteryPoints",
+        points
+    );
+
+}
+
+
+document.getElementById(
+    "points"
+).textContent = points;
+
+</script>
+
+</body>
+
+</html>

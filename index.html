@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sorteo Diario Gratuito</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #000;
+    color: #d4af37;
+    font-family: "Courier New", monospace;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.app {
+    width: 100%;
+    max-width: 1050px;
+    min-height: 100vh;
+    background: #050505;
+    padding: 35px 20px 60px;
+    text-align: center;
+    border-left: 1px solid #111;
+    border-right: 1px solid #111;
+}
+
+/* TITLE */
+
+.title {
+    font-size: clamp(25px, 4vw, 44px);
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    color: #d4af37;
+    text-shadow:
+        0 0 5px rgba(212,175,55,0.5),
+        0 0 15px rgba(212,175,55,0.3);
+}
+
+/* JACKPOT */
+
+.jackpot-title {
+    font-size: clamp(25px, 4vw, 40px);
+    margin-bottom: 10px;
+}
+
+.jackpot-points {
+    font-size: clamp(32px, 5vw, 50px);
+    margin-bottom: 5px;
+    color: #ffd700;
+    text-shadow: 0 0 12px rgba(255,215,0,0.35);
+}
+
+.jackpot-money {
+    font-size: clamp(28px, 4vw, 42px);
+    margin-bottom: 55px;
+    color: #ffd700;
+    text-shadow: 0 0 12px rgba(255,215,0,0.35);
+}
+
+
+/* COUNTDOWN */
+
+.draw {
+    font-size: clamp(25px, 4vw, 40px);
+    margin-bottom: 5px;
+}
+
+.countdown {
+    font-size: clamp(28px, 4vw, 40px);
+    margin-bottom: 75px;
+}
+
+/* VIDEO */
+
+.video-box {
+    max-width: 680px;
+    height: 140px;
+    margin: 0 auto 60px;
+    border: 3px solid #d4af37;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 0 15px rgba(212,175,55,0.2);
+}
+
+.video-box:hover {
+    background: #111111;
+    transform: scale(1.01);
+    box-shadow: 0 0 25px rgba(212,175,55,0.4);
+}
+
+.video-title {
+    font-size: clamp(22px, 3vw, 34px);
+    margin-bottom: 10px;
+}
+
+.video-button {
+    font-size: clamp(22px, 3vw, 34px);
+}
+
+/* WHEEL */
+
+.wheel-container {
+    margin: 20px auto 45px;
+}
+
+.wheel {
+    width: 220px;
+    height: 220px;
+
+    border-radius: 50%;
+
+    margin: auto;
+
+    position: relative;
+
+    background:
+        conic-gradient(
+            #050505 0deg 45deg,
+            #d4af37 45deg 90deg,
+            #050505 90deg 135deg,
+            #d4af37 135deg 180deg,
+            #050505 180deg 225deg,
+            #d4af37 225deg 270deg,
+            #050505 270deg 315deg,
+            #d4af37 315deg 360deg
+        );
+
+    border: 4px solid #d4af37;
+
+    box-shadow:
+        0 0 20px rgba(212,175,55,0.45);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    transform-origin: center center;
+}
+
+.wheel::after {
+    content: "";
+    width: 30px;
+    height: 30px;
+    background: #050505;
+    border: 3px solid #d4af37;
+    border-radius: 50%;
+}
+
+.spinning {
+    animation: spinAndGrow 2.1s cubic-bezier(.17,.67,.19,1);
+}
+
+@keyframes spinAndGrow {
+
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+
+    20% {
+        transform: rotate(300deg) scale(1.25);
+    }
+
+    70% {
+        transform: rotate(1100deg) scale(1.25);
+    }
+
+    100% {
+        transform: rotate(1440deg) scale(1);
+    }
+
+}
+
+/* SPIN BUTTON */
+
+.spin-button {
+    background: transparent;
+    color: #d4af37;
+
+    border: none;
+
+    font-family: "Courier New", monospace;
+    font-size: clamp(23px, 3vw, 34px);
+
+    cursor: pointer;
+
+    margin-bottom: 65px;
+}
+
+.spin-button:hover {
+    color: rgb(255, 230, 0);
+}
+
+.spin-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* INFORMATION */
+
+.info {
+    font-size: clamp(22px, 3vw, 32px);
+    line-height: 1.7;
+}
+
+.points {
+    margin-bottom: 30px;
+}
+
+.entry {
+    margin-bottom: 30px;
+}
+
+.next-spin {
+    margin-bottom: 55px;
+}
+
+.invite {
+    font-size: clamp(21px, 3vw, 30px);
+    margin-bottom: 5px;
+    color: #d4af37;
+}
+
+.invite-sub {
+    font-size: clamp(18px, 3vw, 26px);
+    margin-bottom: 55px;
+    color: #d4af37;
+}
+
+/* POPUP */
+
+.popup {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.8);
+
+    display: none;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    z-index: 100;
+}
+
+.popup-content {
+    background: #050505;
+    border: 2px solid #d4af37;
+
+    width: 100%;
+    max-width: 500px;
+
+    padding: 40px 25px;
+
+    text-align: center;
+}
+
+.popup-content h2 {
+    margin-bottom: 25px;
+}
+
+.popup-content p {
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.close {
+    border: 1px solid #d4af37;
+    background: transparent;
+    color: #d4af37;
+
+    padding: 12px 25px;
+
+    font-family: "Courier New", monospace;
+    font-size: 18px;
+
+    cursor: pointer;
+}
+
+.close:hover {
+    background: #d4af37;
+    color: #000;
+}
+
+/* MOBILE */
+
+@media(max-width:600px) {
+
+    .app {
+        padding: 25px 15px 50px;
+    }
+
+    .title {
+        margin-bottom: 40px;
+    }
+
+    .video-box {
+        height: 120px;
+    }
+
+    .wheel {
+        width: 180px;
+        height: 180px;
+    }
+
+}
+
+.games-link {
+    display: block;
+    width: 100%;
+    max-width: 680px;
+    
+
+
+    margin: 60px auto 0;
+
+    padding: 20px;
+
+    border: 2px solid #d4af37;
+
+    color: #d4af37;
+
+    text-decoration: none;
+
+    font-family: "Courier New", monospace;
+
+    font-size: clamp(20px, 3vw, 30px);
+
+    text-align: center;
+
+    transition: 0.2s;
+
+    box-shadow:
+        0 0 10px rgba(212,175,55,0.15);
+}
+
+.games-link:hover {
+    background: #d4af37;
+    color: #000;
+
+    box-shadow:
+        0 0 25px rgba(212,175,55,0.5);
+
+    transform: scale(1.02);
+}
+
+.prize {
+    position: absolute;
+
+    width: 70px;
+
+    height: 40px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    text-align: center;
+
+    color: #ffd700;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    line-height: 1.1;
+
+    pointer-events: none;
+}
+
+
+/* 1000 - TOP */
+
+.prize1 {
+    top: 18px;
+    left: 75px;
+}
+
+
+/* 100 - TOP RIGHT */
+
+.prize2 {
+    top: 55px;
+    right: 15px;
+}
+
+
+/* 50 - RIGHT */
+
+.prize3 {
+    top: 90px;
+    right: 5px;
+}
+
+
+/* 25 - BOTTOM RIGHT */
+
+.prize4 {
+    bottom: 55px;
+    right: 15px;
+}
+
+
+/* 10 - BOTTOM */
+
+.prize5 {
+    bottom: 18px;
+    left: 75px;
+}
+
+
+/* 1 - BOTTOM LEFT */
+
+.prize6 {
+    bottom: 55px;
+    left: 15px;
+}
+
+
+/* 0.5 - LEFT */
+
+.prize7 {
+    top: 90px;
+    left: 5px;
+}
+
+
+/* BETTER LUCK - TOP LEFT */
+
+.prize8 {
+    top: 55px;
+    left: 15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- TITLE -->
+
+    <div class="title">
+        Sorteo Diario Gratuito
+    </div>
+    <div class="invite">
+            👥 Invita Amigos
+        </div>
+
+        <div class="invite-sub">
+            Gana 100 puntos cada uno Registrado
+        </div>
+
+
+    <!-- JACKPOT -->
+
+    <div class="jackpot-title">
+        🏆 Jackpot actual
+    </div>
+
+    <div class="jackpot-points">
+        1,000 Puntos
+    </div>
+
+    <div class="jackpot-money">
+        $1.00
+    </div>
+
+
+    <!-- COUNTDOWN -->
+
+    <div class="draw">
+        Sorteo en:
+    </div>
+
+    <div class="countdown" id="countdown">
+        08:42:17:32
+    </div>
+
+
+    <!-- VIDEO -->
+
+    <div class="video-box" id="videoButton">
+
+        <div class="video-title">
+            ¿QUIERES OTRA RONDA?
+        </div>
+
+        <div class="video-button">
+            📺 VER UN VIDEO
+        </div>
+
+    </div>
+
+
+    <!-- WHEEL -->
+
+    <div class="wheel" id="wheel">
+
+    <div class="prize prize1">1000<br>PTS</div>
+    <div class="prize prize2">100<br>PTS</div>
+    <div class="prize prize3">50<br>PTS</div>
+    <div class="prize prize4">25<br>PTS</div>
+    <div class="prize prize5">10<br>PTS</div>
+    <div class="prize prize6">1<br>PT</div>
+    <div class="prize prize7">0.5<br>PTS</div>
+    <div class="prize prize8">MEJOR<br>SUERTE</div>
+
+    <div class="wheel-center"></div>
+
+</div>
+
+
+    <!-- SPIN -->
+
+    <button
+        class="spin-button"
+        id="spinButton"
+        onclick="spinWheel()">
+
+        [ Gira la Rueda ]
+
+    </button>
+
+
+    <!-- USER INFORMATION -->
+
+    <div class="info">
+
+        <div class="points">
+            Tus puntos:
+            <span id="points">127</span>
+        </div>
+
+        <div class="entry">
+            🎟️ Entrada de hoy: ✓
+        </div>
+
+        <div class="next-spin">
+            Siguiente oportunidad:<br>
+            Mañana
+        </div>
+
+    </div>
+
+
+    <!--GAMES LINK-->-->
+
+<a href="juegos.html" class="games-link">
+    🎰 ¡Juega y multiplica tus ganancias!
+</a>
+
+</div>
+
+<!-- POPUP -->
+
+<div class="popup" id="popup">
+
+    <div class="popup-content">
+
+        <h2>🎉 ¡GANASTE!</h2>
+
+        <p id="winMessage">
+            ¡Felicidades!
+        </p>
+
+        <button
+            class="close"
+            onclick="closePopup()">
+
+            Cerrar
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================
+   POINTS
+===================================== */
+
+let points = localStorage.getItem("lotteryPoints");
+
+if (points === null) {
+
+    points = 127;
+
+    localStorage.setItem(
+        "lotteryPoints",
+        points
+    );
+
+}
+
+points = Number(points);
+
+document.getElementById("points").textContent = points;
+
+
+/* =====================================
+   COUNTDOWN
+===================================== */
+
+let countdownSeconds =
+    (8 * 24 * 60 * 60) +
+    (42 * 60 * 60) +
+    (17 * 60) +
+    32;
+
+
+function updateCountdown() {
+
+    if (countdownSeconds <= 0) {
+
+        countdownSeconds = 24 * 60 * 60;
+
+    }
+
+    let days =
+        Math.floor(
+            countdownSeconds /
+            (24 * 60 * 60)
+        );
+
+    let hours =
+        Math.floor(
+            (countdownSeconds %
+            (24 * 60 * 60)) /
+            (60 * 60)
+        );
+
+    let minutes =
+        Math.floor(
+            (countdownSeconds %
+            (60 * 60)) /
+            60
+        );
+
+    let seconds =
+        countdownSeconds % 60;
+
+
+    document.getElementById(
+        "countdown"
+    ).textContent =
+
+        String(days).padStart(2,"0") + ":" +
+
+        String(hours).padStart(2,"0") + ":" +
+
+        String(minutes).padStart(2,"0") + ":" +
+
+        String(seconds).padStart(2,"0");
+
+
+    countdownSeconds--;
+
+}
+
+setInterval(
+    updateCountdown,
+    1000
+);
+
+
+/* =====================================
+   SPIN WHEEL
+===================================== */
+
+let spinning = false;
+
+
+function spinWheel() {
+
+    if (spinning) return;
+
+    spinning = true;
+
+    const wheel =
+        document.getElementById("wheel");
+
+    const button =
+        document.getElementById("spinButton");
+
+
+    button.disabled = true;
+
+    wheel.classList.remove("spinning");
+
+    /*
+       Force browser to restart animation
+    */
+
+    void wheel.offsetWidth;
+
+    wheel.classList.add("spinning");
+
+
+    setTimeout(function() {
+
+        /*
+           Example prizes
+        */
+
+        const prizes = [
+            5,
+            10,
+            25,
+            50,
+            100
+        ];
+
+
+        const randomIndex =
+            Math.floor(
+                Math.random() *
+                prizes.length
+            );
+
+
+        const prize =
+            prizes[randomIndex];
+
+
+        points += prize;
+
+
+        localStorage.setItem(
+            "lotteryPoints",
+            points
+        );
+
+
+        document.getElementById(
+            "points"
+        ).textContent = points;
+
+
+        document.getElementById(
+            "winMessage"
+        ).textContent =
+
+            "You won " +
+            prize +
+            " points!";
+
+
+        document.getElementById(
+            "popup"
+        ).style.display = "flex";
+
+
+        spinning = false;
+
+        button.disabled = false;
+
+
+    }, 2100);
+
+}
+
+
+/* =====================================
+   CLOSE POPUP
+===================================== */
+
+function closePopup() {
+
+    document.getElementById(
+        "popup"
+    ).style.display = "none";
+
+}
+
+
+/* =====================================
+   WATCH VIDEO BUTTON
+===================================== */
+
+document.getElementById(
+    "videoButton"
+).addEventListener(
+    "click",
+    function() {
+
+        alert(
+            "This is where you would connect your video advertisement."
+        );
+
+    }
+);
+
+</script>
+
+</body>
+</html>
