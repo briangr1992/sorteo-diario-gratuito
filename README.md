@@ -6,9 +6,9 @@ Aplicación web en español con Node.js, Express y PostgreSQL. Render sirve la a
 
 1. Sube este proyecto a un repositorio Git y crea un Blueprint en Render usando `render.yaml`.
 2. Configura los secretos en Render Environment. No guardes claves en Git ni las compartas en el chat.
-3. El servicio ejecuta `npm install` y `npm start`; el esquema de `db/schema.sql` se aplica al iniciar.
+3. El servicio ejecuta `npm ci` (usa las versiones fijadas en `package-lock.json`) y `npm start`; el esquema de `db/schema.sql` se aplica al iniciar.
 4. Añade `PUBLIC_ORIGIN` si usas un dominio propio. En Render, el origen se detecta desde `RENDER_EXTERNAL_URL`.
-5. Configura OAuth y email con los callbacks descritos abajo antes de permitir registros públicos.
+5. Configura OAuth con los callbacks descritos abajo. El registro nuevo por correo está desactivado; las cuentas existentes aún pueden usar correo para iniciar sesión o recuperar el acceso.
 
 **Importante:** en la raíz del repositorio deben estar `package.json`, `server.js`, `render.yaml` y `schema.sql`. También se admite `db/schema.sql` si subes la carpeta `db`. El servidor carga primero `db/schema.sql` y, si no existe, usa `schema.sql` de la raíz. Si no se incluye ninguno, Render detendrá el servicio con un error `ENOENT`.
 
@@ -32,9 +32,9 @@ Registra estos redirect URIs con los proveedores OAuth: `https://TU-DOMINIO/api/
 3. En **Authorized redirect URIs**, agrega el callback exacto de tu app: `https://TU-SERVICIO.onrender.com/api/auth/google/callback` (o el mismo dominio propio que uses en `PUBLIC_ORIGIN`). La URI debe coincidir exactamente, incluyendo esquema, dominio y ruta. Este flujo usa OAuth del servidor; no necesita un JavaScript origin.
 4. Copia el **Client ID** a `GOOGLE_CLIENT_ID` y el **Client secret** a `GOOGLE_CLIENT_SECRET` en Render → servicio → **Environment**. Guarda y redeploy. No pongas el secreto en el código ni en una página web.
 
-### Activar correo para registros
+### Configurar correo para recuperación de cuentas
 
-Recomiendo Resend porque Render bloquea las conexiones SMTP salientes en los puertos 25, 465 y 587 para servicios Free. Crea una cuenta en [Resend](https://resend.com/), añade un dominio o subdominio de envío, publica los registros SPF/DKIM que te indique Resend en el DNS y espera la verificación. Después crea una API key solo para envío y agrega a Render `RESEND_API_KEY` y `EMAIL_FROM` (por ejemplo, `Sorteo Diario <cuentas@correo.tudominio.com>`), usando una dirección del dominio verificado. Así se entregan los enlaces de verificación, recuperación y eliminación de cuenta. No compartas aquí la API key. [Límites de Render Free](https://render.com/docs/free), [autenticación de dominios en Resend](https://resend.com/docs/dashboard/domains).
+Recomiendo Resend porque Render bloquea las conexiones SMTP salientes en los puertos 25, 465 y 587 para servicios Free. Crea una cuenta en [Resend](https://resend.com/), añade un dominio o subdominio de envío, publica los registros SPF/DKIM que te indique Resend en el DNS y espera la verificación. Después crea una API key solo para envío y agrega a Render `RESEND_API_KEY` y `EMAIL_FROM` (por ejemplo, `Sorteo Diario <cuentas@correo.tudominio.com>`), usando una dirección del dominio verificado. El registro nuevo por correo está desactivado. El correo transaccional sirve para recuperar cuentas anteriores y solicitudes de eliminación de cuenta. No compartas aquí la API key. [Límites de Render Free](https://render.com/docs/free), [autenticación de dominios en Resend](https://resend.com/docs/dashboard/domains).
 
 Para desarrollo local, puedes ejecutar Node.js con PostgreSQL local, usar `PUBLIC_ORIGIN=http://localhost:10000`, y agregar `http://localhost:10000/api/auth/google/callback` como URI de prueba en otro cliente OAuth de tipo Web. Las cuentas y correos de prueba locales no aparecerán automáticamente en la base desplegada de Render.
 
@@ -48,13 +48,13 @@ Los usuarios y sus contraseñas cifradas se conservan al copiar la base. Por seg
 
 - Cuentas con email verificado, inicio de sesión por Google/Facebook/Instagram cuando se configuran credenciales, sesiones en PostgreSQL, CSRF, límites de frecuencia y contraseñas cifradas.
 - Reclamación horaria de boleto y puntos; giro de rueda horario decidido por el servidor; saldo y libro mayor de puntos.
-- Blackjack contra banca y Guerra contra bot. Las cartas se reparten en el servidor; las victorias verificadas reciben hasta 250 puntos diarios.
-- Ajedrez contra bot con movimientos legales comprobados por el servidor. Ludo contra bot, Kamikaze Race 2D, penales, air hockey, ping pong y Supercars arcade se juegan localmente.
-- Chat global con controles de frecuencia y reportes; página de resultados; referidos, premios próximos y página de salas.
+- Blackjack contra la banca y Guerra contra bot. Guerra también tiene salas online para dos jugadores; las cartas y rondas se resuelven en el servidor y no entregan puntos.
+- Ajedrez contra bot y online, con movimientos legales verificados por el servidor. Ludo contra bot, Kamikaze Race 2D, penales, hockey, ping pong y Supercars arcade se juegan en el dispositivo. Hockey incluye modo local para dos personas (flechas y W/A/S/D) y salas online para dos jugadores. En hockey online el navegador anfitrión calcula la física y el servidor retransmite estados; no se otorgan puntos.
+- Chat global con controles de frecuencia y reportes; página de resultados; referidos, premios próximos y página de salas, estadísticas de boletos, partidas e ingresos publicitarios reportados.
 - Antifraude básico para autorreferidos, cuentas repetidas y actividad elegible de referidos.
 - Ubicaciones de anuncios adaptables y carga diferida. Los espacios quedan vacíos hasta conectar inventario, obtener aprobación del proveedor y disponer de la señal CMP requerida.
 
-Quismi y Truco aparecen en preparación: Quismi necesita sus reglas originales para crear un juego correcto; Truco todavía no tiene lógica de partida. Las salas de ajedrez permiten partidas en línea con jugadas validadas por el servidor; otros juegos multijugador aún no están disponibles. Las partidas locales distintas de cartas y ajedrez no otorgan puntos porque sus resultados aún no se verifican en servidor.
+Quismi y Truco aparecen en preparación: Quismi necesita sus reglas originales para crear un juego correcto; Truco todavía no tiene lógica de partida. Las salas de ajedrez permiten partidas en línea con jugadas validadas por el servidor. Guerra de cartas permite partidas online para dos personas y compara cada ronda en el servidor. El hockey ofrece multijugador local y online; la sala online no concede puntos porque la física se ejecuta en el navegador anfitrión. Las partidas locales distintas de cartas y ajedrez no otorgan puntos porque sus resultados aún no se verifican en servidor.
 
 ## Anuncios y CMP
 

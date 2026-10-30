@@ -3,7 +3,7 @@ services:
     runtime: node
     name: sorteo-diario-gratuito
     plan: free
-    buildCommand: npm install
+    buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
