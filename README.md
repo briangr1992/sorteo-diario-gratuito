@@ -10,6 +10,8 @@ Aplicación web en español con Node.js, Express y PostgreSQL. Render sirve la a
 4. Añade `PUBLIC_ORIGIN` si usas un dominio propio. En Render, el origen se detecta desde `RENDER_EXTERNAL_URL`.
 5. Configura OAuth y email con los callbacks descritos abajo antes de permitir registros públicos.
 
+**Importante:** en la raíz del repositorio deben estar `package.json`, `server.js`, `render.yaml` y `schema.sql`. También se admite `db/schema.sql` si subes la carpeta `db`. El servidor carga primero `db/schema.sql` y, si no existe, usa `schema.sql` de la raíz. Si no se incluye ninguno, Render detendrá el servicio con un error `ENOENT`.
+
 El Blueprint usa instancias Free para vista previa. No son adecuadas para producción: la web puede dormir y la base gratuita de Render expira. Cambia ambos planes por recursos persistentes antes de operar cuentas o sorteos reales. Revisa [las limitaciones de Render Free](https://render.com/docs/free).
 
 ## Variables y servicios externos
@@ -35,6 +37,12 @@ Registra estos redirect URIs con los proveedores OAuth: `https://TU-DOMINIO/api/
 Recomiendo Resend porque Render bloquea las conexiones SMTP salientes en los puertos 25, 465 y 587 para servicios Free. Crea una cuenta en [Resend](https://resend.com/), añade un dominio o subdominio de envío, publica los registros SPF/DKIM que te indique Resend en el DNS y espera la verificación. Después crea una API key solo para envío y agrega a Render `RESEND_API_KEY` y `EMAIL_FROM` (por ejemplo, `Sorteo Diario <cuentas@correo.tudominio.com>`), usando una dirección del dominio verificado. Así se entregan los enlaces de verificación, recuperación y eliminación de cuenta. No compartas aquí la API key. [Límites de Render Free](https://render.com/docs/free), [autenticación de dominios en Resend](https://resend.com/docs/dashboard/domains).
 
 Para desarrollo local, puedes ejecutar Node.js con PostgreSQL local, usar `PUBLIC_ORIGIN=http://localhost:10000`, y agregar `http://localhost:10000/api/auth/google/callback` como URI de prueba en otro cliente OAuth de tipo Web. Las cuentas y correos de prueba locales no aparecerán automáticamente en la base desplegada de Render.
+
+### Cambiar de hosting más adelante
+
+El sitio guarda cuentas, contraseñas cifradas, identidades OAuth, boletos, puntos, referidos, chat y partidas en PostgreSQL; no depende de archivos persistentes del servidor web. Para migrar, prepara PostgreSQL compatible en el nuevo host, saca una copia con `pg_dump` y restáurala en una base vacía con `pg_restore`/`psql`, cambia `DATABASE_URL`, despliega la misma versión de la aplicación y verifica cuentas, puntos, boletos y sorteos antes de cambiar el dominio. Haz el corte en una ventana breve de mantenimiento para que nadie escriba en la base vieja durante la copia final. Conserva la base antigua hasta confirmar que la nueva funciona.
+
+Los usuarios y sus contraseñas cifradas se conservan al copiar la base. Por seguridad, es mejor pedirles que vuelvan a iniciar sesión después del cambio; las sesiones guardadas también viven en PostgreSQL, pero requieren conservar el mismo `SESSION_SECRET` para seguir válidas. Actualiza en Google/Facebook/Instagram los callbacks OAuth al nuevo dominio, cambia `PUBLIC_ORIGIN`, revisa `EMAIL_FROM` y los registros DNS de correo, y lleva también las claves del proveedor de anuncios/CMP. Nunca envíes un dump o una URL de base de datos sin cifrar ni los guardes en la carpeta pública del sitio. Render documenta la exportación y restauración con `pg_dump`/`pg_restore`; los servicios Free no incluyen exportaciones administradas ni copias de seguridad de Postgres. [Guía de copias y exportación de Render](https://render.com/docs/postgresql-backups).
 
 ## Disponible en el proyecto
 
