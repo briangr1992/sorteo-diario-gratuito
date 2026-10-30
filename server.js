@@ -27,7 +27,7 @@ app.use(session({name:'sorteo.sid',secret:process.env.SESSION_SECRET,resave:fals
 app.use('/api',rateLimit({windowMs:60000,limit:120,standardHeaders:'draft-8',legacyHeaders:false}));
 const authLimit=rateLimit({windowMs:900000,limit:12,standardHeaders:'draft-8',legacyHeaders:false});
 const chatLimit=rateLimit({windowMs:60000,limit:12,standardHeaders:'draft-8',legacyHeaders:false});
-await pool.query(await fs.readFile(path.join(root,'db','schema.sql'),'utf8'));
+let schemaSql;try{schemaSql=await fs.readFile(path.join(root,'db','schema.sql'),'utf8')}catch(e){if(e.code!=='ENOENT')throw e;schemaSql=await fs.readFile(path.join(root,'schema.sql'),'utf8')}await pool.query(schemaSql);
 const rnd=()=>crypto.randomBytes(32).toString('hex'),sha=s=>crypto.createHash('sha256').update(s).digest('hex'),mac=s=>crypto.createHmac('sha256',process.env.SESSION_SECRET).update(String(s||'')).digest('hex');
 const same=(a,b)=>{const x=Buffer.from(String(a||'')),y=Buffer.from(String(b||''));return x.length===y.length&&crypto.timingSafeEqual(x,y)};
 function playingDeck(){const suits=['♠','♥','♦','♣'],ranks=['A','2','3','4','5','6','7','8','9','10','J','Q','K'],cards=[];for(const suit of suits)for(let i=0;i<13;i++)cards.push({suit,rank:ranks[i],value:i===0?14:i+1,blackjack:i===0?11:i>9?10:i+1});for(let i=cards.length-1;i>0;i--){const j=crypto.randomInt(i+1);[cards[i],cards[j]]=[cards[j],cards[i]]}return cards}
