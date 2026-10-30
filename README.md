@@ -47,7 +47,7 @@ Los usuarios y sus contraseñas cifradas se conservan al copiar la base. Por seg
 ## Disponible en el proyecto
 
 - Cuentas con email verificado, inicio de sesión por Google/Facebook/Instagram cuando se configuran credenciales, sesiones en PostgreSQL, CSRF, límites de frecuencia y contraseñas cifradas.
-- Reclamación horaria de boleto y puntos; giro de rueda horario decidido por el servidor; saldo y libro mayor de puntos.
+- Un giro gratis por hora entrega de forma atómica un premio de puntos y un boleto para la lotería; ambos comparten un único temporizador. El servidor controla el límite, el saldo y el libro mayor de puntos.
 - Blackjack contra la banca y Guerra contra bot. Guerra también tiene salas online para dos jugadores; las cartas y rondas se resuelven en el servidor y no entregan puntos.
 - Ajedrez contra bot y online, con movimientos legales verificados por el servidor. Ludo contra bot, Kamikaze Race 2D, penales, hockey, ping pong y Supercars arcade se juegan en el dispositivo. Hockey incluye modo local para dos personas (flechas y W/A/S/D) y salas online para dos jugadores. En hockey online el navegador anfitrión calcula la física y el servidor retransmite estados; no se otorgan puntos.
 - Chat global con controles de frecuencia y reportes; página de resultados; referidos, premios próximos y salas. El panel de estadísticas está al final del inicio y se refresca automáticamente cada 30 segundos.
